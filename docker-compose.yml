@@ -1,0 +1,57 @@
+﻿services:
+    #SQL Server container
+    sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=Challenge25
+        ports:
+            - "1400:1433"
+        networks:
+            - dockernetwork
+    
+    # Elastic container
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.17.2
+        container_name: elasticsearch
+        environment:
+            - discovery_type:single-node
+            - ELASTIC_PASSWORD=Elastic2025
+        ports:
+            - "9200:9200"
+        networks:
+            - dockernetwork
+
+    # Kibana container
+    kibana:
+        image: docker.elastic.co/kibana/kibana:8.17.2
+        container_name: kibana
+        environment:
+            - ELASTICSEARCH_HOSTS =https://elasticsearch:9200 
+        ports:
+            - "5601:5601"
+        networks:
+            - dockernetwork
+        depends_on:
+            - elasticsearch
+
+    # .NET app container
+    userpermissionsadmin:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - ConnectionStrings__DataBaseConnection=Server=host.docker.internal,1400;Database=n5now_challenge;Trusted_Connection=False;Encrypt=False;user=sa;password=Challenge25;
+            - Elasticsearch__Uri=https://elasticsearch:9200
+        ports:
+            - "5000:8080"
+        depends_on:
+            - sqlserver
+            - elasticsearch
+        networks:
+            - dockernetwork
+
+networks:
+    dockernetwork:
+        driver: bridge
