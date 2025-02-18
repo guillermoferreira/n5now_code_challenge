@@ -25,4 +25,10 @@ From the UserPermissionAdminTest project we can find a PermissionControllerInteg
 
 ## Considerations
 
+### Elasticserch issues
+
 I was not able to get work ElasticSearch from the app but I could do it from Kibana. It is because I couldn't set the correct configuration for authenticating the app in SSL mode by using the credentials and/or the fingerprint. However, all the logic and configuration was implemented.
+
+### Information logs handle
+
+I decided to implement a middleware to handle the logs for each request and response. Please, check the class RequestLoggingMiddleware out in the Middleware folder from the UserPermissionsAdmin project.
